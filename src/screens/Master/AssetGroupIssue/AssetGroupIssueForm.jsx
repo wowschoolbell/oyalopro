@@ -29,6 +29,7 @@ function AssetGroupIssueForm() {
     gettingAssetGroup,
     getAssetGroupResponse: {data: assetGroups}
   } = useSelector((state) => {
+    console.log('1')
     return state.service;
   });
 

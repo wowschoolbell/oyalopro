@@ -150,6 +150,7 @@ export const serviceSlice = createSlice({
     getAssetGroupResponse: (state, action) => {
       state.gettingAssetGroup = false;
       state.getAssetGroupResponse = action.payload;
+      console.log(action)
     },
     getAssetGroupError: (state, action) => {
       state.gettingAssetGroup = false;

@@ -21,7 +21,7 @@ import {transStatus} from '../../../util/transStatus';
 // import { Input } from 'antd';
 import {getFormData, CREATE_TICKET_FORM_DATA} from './createTicket.constants';
 import {includes, map} from 'ramda';
-import {getAssetGroup, getAssetMaster, getPriority, getServiceFor, getTypeOfService, saveTickets, updateTickets} from '../../../@app/service/serviceSlice';
+import {getAssetGroup, getAssetMaster, getPriority, getServiceFor, getTypeOfService, saveTickets, updateTickets, getAssetGroupIssue} from '../../../@app/service/serviceSlice';
 import typesOfIssue from './typesOfIssue.constant';
 import {MultiUploadButton} from '../../../components/multiUploadButton/MultiUploadButton';
 const {TextArea} = Input;
@@ -58,14 +58,17 @@ const CreateTicketForm = () => {
     gettingAssetGroup,
     getAssetGroupResponse: {data: assetGroups},
     gettingNewAssetMaster,
-    getNewAssetMasterResponse: {data: assetMasters},
+    getAssetMasterResponse: {data: assetMasters},
     gettingTypeOfService,
-    getTypeOfServiceResponse: {data: typeOfServices}
+    getTypeOfServiceResponse: {data: typeOfServices},
+    //getAssetGroupIssueResponse: {data: typesOfIssue}
   } = useSelector((state) => {
+    console.log(state.service.getAssetGroupIssueResponse)
     return state.service;
   });
 
   const serviceFor = Form.useWatch('service_for', form);
+  const assetGroup = Form.useWatch('asset_group', form);
   const selectedOutlet = Form.useWatch('outlet_name', form);
   const selectedAssignedTo = Form.useWatch('assigned_to', form);
 
@@ -87,6 +90,7 @@ const CreateTicketForm = () => {
     dispatch(getTypeOfService());
     dispatch(getEmployeeMapping());
     dispatch(getEmployeeMaster());
+    dispatch(getAssetGroupIssue());
   }, [dispatch]);
 
   useEffect(() => {
@@ -196,7 +200,7 @@ const CreateTicketForm = () => {
                 {['Equipment', 'IT'].includes(service) && (
                   <>
                     <Col md={{span: 6}} xs={{span: 24}}>
-                      <Form.Item name='assetGroup' label='Asset Group'>
+                      <Form.Item name='asset_group' label='Asset Group'>
                         <Select
                           placeholder='Select'
                           //   loading={gettingState}
@@ -204,11 +208,13 @@ const CreateTicketForm = () => {
                           filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
                           {map(
                             (assetGroup) => {
+                              if (assetGroup.servicefor_id == serviceFor){
                               return (
                                 <Option key={assetGroup?.id} value={assetGroup?.id}>
                                   {assetGroup?.name}
                                 </Option>
                               );
+                            }
                             },
                             assetGroups ? assetGroups : []
                           )}
@@ -224,11 +230,14 @@ const CreateTicketForm = () => {
                           filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
                           {map(
                             (assetMaster) => {
+                              // console.log(assetMaster)
+                              if (assetMaster.asset_group_id == assetGroup) {
                               return (
-                                <Option key={assetMaster?.id} value={assetMaster?.id}>
-                                  {assetMaster?.asset}
+                                <Option key={assetMaster?.asset_group_id} value={assetMaster?.asset_group_id}>
+                                  {assetMaster?.asset_name_sap}
                                 </Option>
                               );
+                            }
                             },
                             assetMasters ? assetMasters : []
                           )}
@@ -264,17 +273,39 @@ const CreateTicketForm = () => {
                 )}
 
                 <Col md={{span: 6}} xs={{span: 24}}>
-                  <Form.Item name='types_of_issue' label='Types of Issue' rules={[{required: true, message: 'Please select Types of Issue'}]}>
+                  <Form.Item name='types_of_issue' label='Types of Issue-s' rules={[{required: true, message: 'Please select Types of Issue'}]}>
                     <Select
                       placeholder='Select'
                       //   loading={gettingState}
                       showSearch
                       filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
-                      {typesOfIssue.map((e) => (
-                        <Option key={e.id} value={e.id}>
-                          {e.name}
-                        </Option>
-                      ))}
+                      {map(
+                            (typesOfIssue) => {
+                              // if (typesOfIssue.asset_group_id === assetGroup) {
+                              //  // console.log(typesOfIssue)
+                              // let issues=typesOfIssue.groupissues;
+                              // // console.log(j)
+                              // console.log(issues)
+                              // // console.log(assetGroup)
+                              // issues.map((data,i)=>{
+                              //   console.log("i",data)
+                              //   return (
+                              //     <Option key={i} value={i}>
+                              //       {data?.name}
+                              //     </Option>
+                              //   );
+                              // })
+                              
+                              // }
+                              return (
+                                <Option key={typesOfIssue?.id} value={typesOfIssue?.id}>
+                                  {typesOfIssue?.name}
+                                </Option>
+                              );
+
+                            },
+                            typesOfIssue ? typesOfIssue : []
+                          )}
                     </Select>
                   </Form.Item>
                 </Col>

@@ -97,7 +97,8 @@ export default function CustomTable({dataSource, column, onClickAdd, title, load
 
         return (
           <Stack direction='row' spacing={3}>
-            <Tooltip placement='bottom' title={'View'}>
+             {title !== 'Create Ticket List'  ? (
+              <Tooltip placement='bottom' title={'View'}>
               <Button
                 variant='outlined'
                 onClick={handleViewClick ? () => handleViewClick(params.row) : view}
@@ -107,12 +108,25 @@ export default function CustomTable({dataSource, column, onClickAdd, title, load
                 <FaEye color='#fff' />
               </Button>
             </Tooltip>
-            {title !== 'Role Master' && title !== 'Audit Report' && title !== 'CAPA Submission List' && title !== 'Approval List' ? (
+             ) : (
+              <></>
+             ) }
+            {title !== 'Role Master' && title !== 'Audit Report' && title !== 'CAPA Submission List' && title !== 'Approval List' && title != 'Create Ticket List' ? (
               <Tooltip placement='bottom' title={'Edit'}>
                 <Button variant='outlined' onClick={() => handleEditClick(params.row)} color='error' style={{backgroundColor: '#ffaf00', width: '50px'}} size='sm'>
                   <FaUserEdit color='#fff' />
                 </Button>
               </Tooltip>
+            ) : (
+              <></>
+            )}
+            {title == 'Create Ticket List'  ? (
+                <>
+                  <div dangerouslySetInnerHTML={{__html: params.value}}></div>
+                  <button className='orangeFactory btn' onClick={() => handleEditClick(params.row)}>
+                    Update
+                  </button>
+                </>
             ) : (
               <></>
             )}

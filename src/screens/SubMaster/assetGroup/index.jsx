@@ -11,7 +11,6 @@ export default function AssetGroup() {
     gettingAssetGroup,
     getAssetGroupResponse: {data: dataSource}
   } = useSelector((state) => {
-    console.log('4')
     return state.service;
   });
 

@@ -30,10 +30,10 @@ const {Option} = Select;
 const CreateTicketForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {state} = useLocation();
   const [form] = Form.useForm();
-
-  let defaultValue = state?.data;
+  const {
+    state: {data: defaultValue}
+  } = useLocation();
 
   const {
     getOutletMasterResponse: {data: outletData},
@@ -63,13 +63,12 @@ const CreateTicketForm = () => {
     getTypeOfServiceResponse: {data: typeOfServices},
     //getAssetGroupIssueResponse: {data: typesOfIssue}
   } = useSelector((state) => {
-    console.log(state.service.getAssetGroupIssueResponse)
     return state.service;
   });
 
   const serviceFor = Form.useWatch('service_for', form);
   const assetGroup = Form.useWatch('asset_group', form);
-  const selectedOutlet = Form.useWatch('outlet_name', form);
+  const selectedOutlet = Form.useWatch('outlet_code', form);
   const selectedAssignedTo = Form.useWatch('assigned_to', form);
 
   const service = (getServiceForData ?? []).find((ServiceFor) => ServiceFor?.id === serviceFor)?.name;
@@ -94,6 +93,7 @@ const CreateTicketForm = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    console.log("DATA", outletData)
     form.setFieldsValue({
       orl_name: (outletData ?? []).find((outletData) => outletData?.id === selectedOutlet)?.orl_name,
       contact_no: (outletData ?? []).find((outletData) => outletData?.id === selectedOutlet)?.orl_cug_no
@@ -132,10 +132,13 @@ const CreateTicketForm = () => {
       <Card>
         <Row>
           <Col span={24}>
-            <Form disabled={savingTickets} name='basic' labelCol={{span: 24}} wrapperCol={{span: 24}} onFinish={onFinish} autoComplete='off' form={form}>
+            <Form disabled={savingTickets} name='basic' labelCol={{span: 24}} wrapperCol={{span: 24}} onFinish={onFinish} autoComplete='off' form={form}
+            initialValues={{
+              ...defaultValue
+            }}>
               <Row gutter={[15, 0]}>
                 <Col md={{span: 6}} xs={{span: 24}}>
-                  <Form.Item name='outlet_name' label='Outlet Name' rules={[{required: true, message: 'Please select Outlet code'}]}>
+                  <Form.Item name='outlet_code' label='Outlet Name' rules={[{required: true, message: 'Please select Outlet code'}]}>
                     <Select placeholder='select Outlet Name' showSearch filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
                       {map(
                         (outlet) => {
@@ -230,7 +233,7 @@ const CreateTicketForm = () => {
                           filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
                           {map(
                             (assetMaster) => {
-                              // console.log(assetMaster)
+                               console.log(assetMaster,"assetMaster")
                               if (assetMaster.asset_group_id == assetGroup) {
                               return (
                                 <Option key={assetMaster?.asset_group_id} value={assetMaster?.asset_group_id}>
@@ -244,35 +247,7 @@ const CreateTicketForm = () => {
                         </Select>
                       </Form.Item>
                     </Col>
-
                     <Col md={{span: 6}} xs={{span: 24}}>
-                      <Form.Item
-                        name='service_type'
-                        label='Type Of Services'
-                        rules={[{required: ['Equipment', 'IT'].includes(service), message: 'Please select Type Of Services'}]}>
-                        <Select
-                          placeholder='Select'
-                          //   loading={gettingState}
-                          typeOfServices
-                          showSearch
-                          filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
-                          {map(
-                            (typeOfService) => {
-                              return (
-                                <Option key={typeOfService?.id} value={typeOfService?.id}>
-                                  {typeOfService?.name}
-                                </Option>
-                              );
-                            },
-                            typeOfServices ? typeOfServices : []
-                          )}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                  </>
-                )}
-
-                <Col md={{span: 6}} xs={{span: 24}}>
                   <Form.Item name='types_of_issue' label='Types of Issue-s' rules={[{required: true, message: 'Please select Types of Issue'}]}>
                     <Select
                       placeholder='Select'
@@ -310,6 +285,35 @@ const CreateTicketForm = () => {
                   </Form.Item>
                 </Col>
 
+                    <Col md={{span: 6}} xs={{span: 24}}>
+                      <Form.Item
+                        name='service_type'
+                        label='Type Of Services'
+                        rules={[{required: ['Equipment', 'IT'].includes(service), message: 'Please select Type Of Services'}]}>
+                        <Select
+                          placeholder='Select'
+                          //   loading={gettingState}
+                          typeOfServices
+                          showSearch
+                          filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                          {map(
+                            (typeOfService) => {
+                              return (
+                                <Option key={typeOfService?.id} value={typeOfService?.id}>
+                                  {typeOfService?.name}
+                                </Option>
+                              );
+                            },
+                            typeOfServices ? typeOfServices : []
+                          )}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </>
+                )}
+
+                
+
                 <Col md={{span: 6}} xs={{span: 24}}>
                   <Form.Item name='assigned_to' label='Assigned To' rules={[{required: true, message: 'Please select Service for'}]}>
                     <Select
@@ -330,9 +334,13 @@ const CreateTicketForm = () => {
                     </Select>
                   </Form.Item>
                 </Col>
+                
                 <Col md={{span: 6}} xs={{span: 24}}>
-                  <Form.Item name='phone_no' label='Phone No' rules={[{required: true, message: 'Please select Phone No'}]}>
-                    <Input disabled />
+                  <Form.Item name='phone_no' label='Phone No'
+                  rules={[
+                    {required: true, message: 'Please select Phone No'},
+                  ]}>
+                    <Input name='phone_no' placeholder='Enter Phone No'  disabled/>
                   </Form.Item>
                 </Col>
 

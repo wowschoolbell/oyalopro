@@ -77,7 +77,6 @@ function AssetGroupForm() {
                     <Select showSearch filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
                       {map(
                         (data) => {
-                          console.log('data :',data)
                           return (
                             <Option key={data.id} value={data.id}>
                               {data.name}

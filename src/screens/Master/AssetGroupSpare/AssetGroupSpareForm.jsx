@@ -27,7 +27,6 @@ function AssetGroupSpareForm() {
     gettingAssetGroup,
     getAssetGroupResponse: {data: assetGroups}
   } = useSelector((state) => {
-    console.log('2')
     return state.service;
   });
 

@@ -32,7 +32,6 @@ function AssetMasterForm() {
     savingAssetMaster,
     getAssetGroupResponse: {data: assetGroups}
   } = useSelector((state) => {
-    console.log(state.service)
     return state.service;
   });
 

@@ -5,13 +5,15 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getTickets} from '../../../@app/service/serviceSlice';
 import {column} from './column';
 
-function CreateTicket({rows}) {
+export default function CreateTicket() {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
   const onClickAdd = () => {
-    navigate('/createTicket/addForm');
+    navigate('/createTicket/addForm', {
+      state: {}
+    });
   };
 
   const {
@@ -22,7 +24,7 @@ function CreateTicket({rows}) {
   });
 
   const handleEditClick = (data) => {
-    console.log(data)
+    console.log("Edit Data",data)
     navigate('/createTicket/addForm', {
       state: {data}
     });
@@ -34,9 +36,8 @@ function CreateTicket({rows}) {
 
   return (
     <div className='h-screen'>
-      <CustomTable rows={rows} loading={gettingTickets} dataSource={dataSource} column={column} handleEditClick={handleEditClick} onClickAdd={onClickAdd} title={'Create Ticket List'} />
+       <CustomTable loading={gettingTickets} dataSource={dataSource} column={column} handleEditClick={handleEditClick} onClickAdd={onClickAdd} title={'Create Ticket List'} />
     </div>
   );
 }
 
-export default CreateTicket;

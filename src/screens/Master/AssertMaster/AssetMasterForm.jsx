@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {transStatus} from '../../../util/transStatus';
 import {addAuditSubCategory, getAuditCategory, getOutletMaster, updateAuditSubCategory} from '../../../@app/master/masterSlice';
 import {map} from 'ramda';
-import {getAssetGroup, getAssetMaster, saveAssetMaster, updateAssetMaster} from '../../../@app/service/serviceSlice';
+import {getAssetGroup, getAssetMaster, saveAssetMaster, updateAssetMaster, getAssetGroupSpare} from '../../../@app/service/serviceSlice';
 import dayjs from 'dayjs';
 import ConfirmOnExit from '../../../components/confirmOnExit/ConfirmOnExit';
 import messageToast from '../../../components/messageToast/messageToast';
@@ -27,10 +27,13 @@ function AssetMasterForm() {
   const [selectedOutlet, setSelectedOutlet] = useState();
   const [status, setStatus] = useState(defaultValue?.status ?? 1);
 
+  const assetGroup = Form.useWatch('asset_group', form);
+
   const {
     gettingAssetGroup,
     savingAssetMaster,
-    getAssetGroupResponse: {data: assetGroups}
+    getAssetGroupResponse: {data: assetGroups},
+    getAssetGroupSpareResponse: {data: assetSpares}
   } = useSelector((state) => {
     return state.service;
   });
@@ -49,6 +52,7 @@ function AssetMasterForm() {
   useEffect(() => {
     dispatch(getAssetGroup());
     dispatch(getOutletMaster());
+    dispatch(getAssetGroupSpare())
   }, [dispatch]);
 
   const handleClickBack = () => {
@@ -171,6 +175,23 @@ function AssetMasterForm() {
                     <DatePicker name='asset_warranty_end_date' format={dateFormat} onChange={(e) => e?.format('YYYY-MM-DD')} placeholder='dd/mm/yyyy' style={{width: '100%'}} />
                   </Form.Item>
                 </Col>
+                <Col md={{span: 4}} xs={{span: 16}}>
+                <Form.Item name='ag_amc' label='AG AMC'
+                   rules={[{required: true, message: 'Please select AG AMC'}]} >
+                  <Select
+                      placeholder='select AG AMC'
+                      onSelect={(e) => setSelectedOutlet(e)}
+                      showSearch
+                      filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                            <Option key="1" value="yes">
+                             Yes
+                            </Option>
+                            <Option key="0" value="no">
+                             No
+                            </Option>
+                    </Select>
+                    </Form.Item>
+                  </Col>
 
                 <Col span={24}>
                   <Form.Item name='status' label='Status ' rules={[{required: true, message: 'Please slect your status'}]}>
@@ -197,7 +218,7 @@ function AssetMasterForm() {
                 <Col span={24}>
                   <Row gutter={[15, 15]}>
                     <Col md={{span: 6}} xs={{span: 24}} lg={8}>
-                      <Form.Item name='spares_list' label='Add Asset Group issue'>
+                      <Form.Item name='spares_list' label='Add Asset Spares'>
                         <Form.List
                           name='spares_list'
                           rules={[
@@ -229,15 +250,33 @@ function AssetMasterForm() {
                                         {
                                           required: true,
                                           whitespace: true,
-                                          message: 'Please input Asset Group issue or delete this field.'
+                                          message: 'Please input Asset Spare or delete this field.'
                                         }
                                       ]}>
-                                      <Input
-                                        style={{
-                                          width: '100% '
-                                        }}
-                                        placeholder='Add spare'
-                                      />
+                                     <Select 
+                                      placeholder='Select Spare'
+                               // loading={gettingState}
+                          showSearch
+                          filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}>
+                          {map(
+                            (assetSpare) => {
+                              if (assetSpare.asset_group_id == assetGroup) {
+                                // assetSpare.assetspares.map(
+                                //   (data) => {
+                                //     console.log("spare list",data)
+                                    
+                                //   }
+                                // )
+                                return (
+                                  <Option key={assetSpare?.asset_group_id} value={assetSpare?.asset_group_id}>
+                                    {assetSpare?.asset_group_id}
+                                  </Option>
+                                  
+                                );
+                            }
+                            }, assetSpares ? assetSpares : []
+                            )}
+                        </Select>
                                     </Form.Item>
                                     {/* const xxxx = data['spare_warranty_end_date']?.format('YYYY-MM-DD'); */}
                                     <Form.Item
